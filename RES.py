@@ -1,17 +1,20 @@
 # Read - Encrypt - Save
 import RPi.GPIO as GPIO
-from mfrc522 import SimpleMFRC522
+import MFRC522
+import signal
 import bcrypt
 
-rfid = SimpleNFRC522()  
+continue_reading = True
 
 password_encrypted = '$2b$14$LcUGT.RzazdCY5KtNn15ROJZIlYTGN1eNM3miiUhnGYe5AJUziGWi'
 
+MIFAREReader = MFRC522.MFRC522()
+       
+
 def read():
     try:
-        print("Scan RFID :")
-        id, text = rfid.read()
-        return id
+        rfid_id = MIFAREReader.MFRC522_SelectTag(uid)
+        return rfid_id
     finally:
         GPIO.cleanup()     
 
@@ -30,13 +33,23 @@ encrypted_rfid_id = encrypt()
 while True:
     password = input('Password: ')
     if bcrypt.checkpw(password.encode('UTF-8'), password_encrypted.encode('UTF-8')):
-        read()
-        encrypt()
-        save()
-        print('Succefully Saved')
-        repeat = input('Encrypt more IDs: y/n: ')
-        if repeat.upper() != 'Y':
-            print('Aborting')
-            break
+        (status,TagType) = MIFAREReader.MFRC522_Request(MIFAREReader.PICC_REQIDL)
+        while continue_reading:
+            if status == MIFAREReader.MI_OK:
+                print("Card Detected")
+        
+            (status,uid) = MIFAREReader.MFRC522_Anticoll()
+
+            if status == MIFAREReader.MI_OK:
+                read()
+                break
+                            
+            encrypt()
+            save()
+            print('Succefully Saved')
+            repeat = input('Encrypt more IDs: y/n: ')
+            if repeat.upper() != 'Y':
+                print('Aborting')
+                break
     else:
         print('Incorrect Password')    
