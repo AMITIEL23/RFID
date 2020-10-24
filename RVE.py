@@ -54,6 +54,8 @@ while True:
         id, name = reader.read()
         print(name.upper())
         string_id = str(id)
+        print(id)
+        print(string_id) 
         validate()
         if validate() == True:
             hexadecimal = randomhex()
