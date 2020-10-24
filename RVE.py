@@ -54,7 +54,7 @@ while True:
         print(name.upper())
         string_id = ""
         for number in id:
-            string_id += id
+            string_id += number
         validate()
         if validate() == True:
             hexadecimal = randomhex()
