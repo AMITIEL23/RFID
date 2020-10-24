@@ -17,10 +17,8 @@ if bcrypt.checkpw(password.encode('UTF-8'), password_encrypted.encode('UTF-8')):
             print("Place Target:")
             reader.write(name)
             print("Success")
-            id = reader.read()
-            string_id = ""
-            for number in id:
-                string_id += str(number)
+            (id, name) = reader.read()
+            string_id = str(id)
             print(id)
             print(string_id)     
             encrypted_rfid_id = bcrypt.hashpw(string_id.encode('UTF-8'), bcrypt.gensalt())
