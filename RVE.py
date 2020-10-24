@@ -50,6 +50,7 @@ def validate():
 
 while True:
     try:
+        print("Place Target: ")
         id, name = reader.read()
         print(name.upper())
         string_id = ""
