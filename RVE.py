@@ -53,9 +53,7 @@ while True:
         print("Place Target: ")
         id, name = reader.read()
         print(name.upper())
-        string_id = ""
-        for number in id:
-            string_id += str(number)
+        string_id = str(id)
         validate()
         if validate() == True:
             hexadecimal = randomhex()
