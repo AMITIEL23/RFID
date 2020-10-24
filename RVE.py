@@ -1,98 +1,69 @@
-# Read - Encrypt - Save
+# Read - Validate - Execute
+#!/usr/bin/env python
 import RPi.GPIO as GPIO
-import MFRC522
-import signal
+from mfrc522 import SimpleMFRC522
 import bcrypt
 import random
 import smtplib, ssl
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
+reader = SimpleMFRC522()
 
-continue_reading = True
+def randomhex():
+    rn = random.randint(80000000, 950000000)
+    hexadecimal = hex(rn)
+    return hexadecimal
+    
+def send_email():
+    sender_email = "boxgroundstation@gmail.com"
+    password = "rfidgroundstationbox"
+    to_email = "angelfuentesbr3556@gmail.com"
 
-password_encrypted = '$2b$14$LcUGT.RzazdCY5KtNn15ROJZIlYTGN1eNM3miiUhnGYe5AJUziGWi'
+    message = MIMEMultipart("alternative")
+    message["Subject"] = 'Your secret number'
+    message["From"] = sender_email
 
-MIFAREReader = MFRC522.MFRC522()
+    part1 = MIMEText(hexadecimal, "plain")
+    message.attach(part1)
 
-def read():
-    try:
-        rfid_id = MIFAREReader.MFRC522_SelectTag(uid)
-        return rfid_id
-    finally:
-        GPIO.cleanup()    
+    message["To"] = sender_email
+    context = ssl.create_default_context()
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
+        server.login(sender_email, password)
+        server.sendmail(sender_email, to_email, message.as_string())
 
-rdif_id = read()
+def program():
+    return print("Hi")
 
 def validate():
-    with open('C:/Users/SLASH/Desktop/Python/RFID/authorized-rfid-cards.txt', 'r') as file: 
+    with open('/RFID/authorized-rfid-cards.txt', 'r') as file: 
         authorized_cards_text = file.read()
     authorized_cards = authorized_cards_text.split(',')
     for cardID in authorized_cards[0:(len(authorized_cards)-1)]:
-        if bcrypt.checkpw(rdif_id.encode('UTF-8'), cardID.encode('UTF-8')):
+        if bcrypt.checkpw(id.encode('UTF-8'), cardID.encode('UTF-8')):
             print('Success')
             return True
             break
         else:
-            print('Failed')
-def execute():
-    def randomhex():
-        rn = random.randint(80000000, 950000000)
-        hexadecimal = hex(rn)
-        return hexadecimal
-    
-    hexadecimal = randomhex()
-
-    def send_email():
-        sender_email = "boxgroundstation@gmail.com"
-        password = "rfidgroundstationbox"
-        to_email = "angelfuentesbr3556@gmail.com"
-
-        message = MIMEMultipart("alternative")
-        message["Subject"] = 'Your secret number'
-        message["From"] = sender_email
-
-        part1 = MIMEText(hexadecimal, "plain")
-        message.attach(part1)
-
-        message["To"] = sender_email
-        context = ssl.create_default_context()
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
-            server.login(sender_email, password)
-            server.sendmail(sender_email, to_email, message.as_string())
-
-    def program():
-        print('Hi')
-
-    while True:
-        send_email()
-        key = input('Introduce the secret key:')
-        if key == hexadecimal:
-            print("Auth Correct")
-            program()
-            break
-
-        else:
-            print("Access denied")   
-            inputagain = input("Input key again y/n:")
-            if inputagain.upper() != 'Y':
-                break            
+            print('Failed')    
 
 while True:
-    while continue_reading:
-        if status == MIFAREReader.MI_OK:
-            print("Card Detected")
-    
-        (status,uid) = MIFAREReader.MFRC522_Anticoll()
+    try:
+        id, name = reader.read()
+        print(name.upper())
+        validate()
+        if validate() == True:
+            hexadecimal = randomhex()
+            send_email()
+            hex_password = input('SECRET CODE: ')
+            if hex_password == hexadecimal:
+                program()
 
-        if status == MIFAREReader.MI_OK:
-            read()
-            break
+    finally:
+        GPIO.cleanup()
 
-    if validate() == True:
-        execute()
-
-    repeat = input('Execute again y/n:')
+    repeat = input('Execute Again y/n: ')
     if repeat.upper() != 'Y':
         print("Aborting")
-        break
+        break    

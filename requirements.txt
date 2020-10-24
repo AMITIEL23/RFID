@@ -1,3 +1,5 @@
+ssl
+bcrypt
+smptlib
 spidev
 mfrc522
-bcrypt
