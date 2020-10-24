@@ -37,11 +37,11 @@ def program():
     return print("Hi")
 
 def validate():
-    with open('/RFID/authorized-rfid-cards.txt', 'r') as file: 
+    with open('/home/ubuntu/RFID/authorized-rfid-cards.txt', 'r') as file: 
         authorized_cards_text = file.read()
     authorized_cards = authorized_cards_text.split(',')
     for cardID in authorized_cards[0:(len(authorized_cards)-1)]:
-        if bcrypt.checkpw(id.encode('UTF-8'), cardID.encode('UTF-8')):
+        if bcrypt.checkpw(string_id.encode('UTF-8'), cardID.encode('UTF-8')):
             print('Success')
             return True
             break
@@ -52,6 +52,9 @@ while True:
     try:
         id, name = reader.read()
         print(name.upper())
+        string_id = ""
+        for number in id:
+            string_id += id
         validate()
         if validate() == True:
             hexadecimal = randomhex()

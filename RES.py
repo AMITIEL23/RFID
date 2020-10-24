@@ -18,9 +18,12 @@ if bcrypt.checkpw(password.encode('UTF-8'), password_encrypted.encode('UTF-8')):
             reader.write(name)
             print("Success")
             id = reader.read()
-            encrypted_rfid_id = bcrypt.hashpw(id.encode('UTF-8'), bcrypt.gensalt())
+            string_id = ""
+            for number in id:
+                string_id += id
+            encrypted_rfid_id = bcrypt.hashpw(string_id.encode('UTF-8'), bcrypt.gensalt())
             encrypted_rfid_id = encrypted_rfid_id.decode('UTF-8')
-            with open('/RFID/authorized-rfid-cards.txt', 'a') as file: 
+            with open('/home/ubuntu/RFID/authorized-rfid-cards.txt', 'a') as file: 
                 file.write(encrypted_rfid_id + ',')
 
         finally:
