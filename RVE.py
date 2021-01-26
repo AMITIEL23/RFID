@@ -16,9 +16,9 @@ def randomhex():
     return hexadecimal
     
 def send_email():
-    sender_email = "boxgroundstation@gmail.com"
-    password = "rfidgroundstationbox"
-    to_email = "angelfuentesbr3556@gmail.com"
+    sender_email = "email@gmail.com"
+    password = "password"
+    to_email = "amilreciver@gmail.com"
 
     message = MIMEMultipart("alternative")
     message["Subject"] = 'Your secret number'
